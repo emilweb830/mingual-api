@@ -5,45 +5,45 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
 require APPPATH . '/libraries/REST_Controller.php';
 
-class Languages extends REST_Controller {
+class Users extends REST_Controller {
 
     function __construct()
     {
         // Construct the parent class
         parent::__construct();
-        $this->load->model('Lang');
+        $this->load->model('User');
     }
 
-    function index_get()
+    public function index_get()
     {
-    	$id_lang = $this->get('id');
+    	$id_user = $this->get('id');
 
-    	if( $id_lang == NULL )
+    	if( $id_user == NULL )
     	{
-    		$arrLang = $this->Lang->getItems();
+    		$arrUsers = $this->User->getItems();
 
-    		if( !empty($arrLang) )
+    		if( !empty($arrUsers) )
     		{
-    			$this->response($arrLang, REST_Controller::HTTP_OK);
+    			$this->response($arrUsers, REST_Controller::HTTP_OK);
     		}
     		else
     		{
     			$this->response([
                     'status' => FALSE,
-                    'message' => 'No language were found'
+                    'message' => 'No User were found'
                 ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
     		}
     	}
 		
-		$id_lang = (int) $id_lang;
+		$id_user = (int) $id_user;
 
-		if ( $id_lang <= 0 )
+		if ( $id_user <= 0 )
         {
             // Invalid id, set the response and exit.
             $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
 
-        $lang = $this->Lang->getItemById( $id_lang );
+        $lang = $this->User->getItemById( $id_user );
         if (!empty($lang))
         {
             $this->set_response($lang, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
@@ -52,15 +52,11 @@ class Languages extends REST_Controller {
         {
             $this->set_response([
                 'status' => FALSE,
-                'message' => 'Language could not be found'
+                'message' => 'User could not be found'
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
-
-    function pro_get()
-    {
-        $id_lang = $this->get('id');
-        echo $id_lang;
-    }
+    
 }
+
 ?>

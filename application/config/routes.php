@@ -62,6 +62,8 @@ $route['api/example/users/(:num)'] = 'api/example/users/id/$1'; // Example 4
 $route['api/example/users/(:num)(\.)([a-zA-Z0-9_-]+)(.*)'] = 'api/example/users/id/$1/format/$3$4'; // Example 8
 
 // Route for Languages
-$route['api/languages'] 			= 'api/languages/languages/';
-$route['api/languages/(:num)'] 		= 'api/languages/languages/id/$1';
+//$route['api/languages'] 			= 'api/languages/index/';
+//$route['api/languages/(:num)'] 		= 'api/languages/index/id/$1';
 
+// General routers
+$route['api/(:any)/(:num)'] = 'api/$1/index/id/$2';

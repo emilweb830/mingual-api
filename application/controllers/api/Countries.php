@@ -15,7 +15,7 @@ class Countries extends REST_Controller {
         $this->load->helper('url');
     }
 
-    function countries_get()
+    function index_get()
     {
     	$id_country = $this->get('id');
 
@@ -33,7 +33,7 @@ class Countries extends REST_Controller {
     		{
     			$this->response([
                     'status' => FALSE,
-                    'message' => 'No languages were found'
+                    'message' => 'No country were found'
                 ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
     		}
     	}
