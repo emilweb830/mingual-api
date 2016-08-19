@@ -355,7 +355,8 @@ Class Facebook
                 return $error;
             }
         }
-
+echo $access_token;
+exit;
         return $access_token;
     }
 

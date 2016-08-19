@@ -7,7 +7,7 @@ require APPPATH . '/libraries/REST_Controller.php';
 
 class Countries extends REST_Controller {
 
-	function __construct()
+    function __construct()
     {
         // Construct the parent class
         parent::__construct();
@@ -17,30 +17,30 @@ class Countries extends REST_Controller {
 
     function index_get()
     {
-    	$id_country = $this->get('id');
+        $id_country = $this->get('id');
 
-    	if( $id_country == NULL )
-    	{
-    		$arrCountries = $this->Country->getItems();
+        if( $id_country == NULL )
+        {
+            $arrCountries = $this->Country->getItems();
 
-    		if( !empty($arrCountries) )
-    		{
-    			foreach( $arrCountries as &$country )
-    				$country->flag = base_url()."uploads/flag/".strtolower( $country->country_code ).".png";
-    			$this->response($arrCountries, REST_Controller::HTTP_OK);
-    		}
-    		else
-    		{
-    			$this->response([
+            if( !empty($arrCountries) )
+            {
+                foreach( $arrCountries as &$country )
+                    $country->flag = base_url()."uploads/flag/".strtolower( $country->country_code ).".png";
+                $this->response($arrCountries, REST_Controller::HTTP_OK);
+            }
+            else
+            {
+                $this->response([
                     'status' => FALSE,
                     'message' => 'No country were found'
                 ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-    		}
-    	}
-		
-		$id_country = (int) $id_country;
+            }
+        }
+        
+        $id_country = (int) $id_country;
 
-		if ( $id_country <= 0 )
+        if ( $id_country <= 0 )
         {
             // Invalid id, set the response and exit.
             $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
@@ -49,6 +49,7 @@ class Countries extends REST_Controller {
         $lang = $this->Country->getItemById( $id_country );
         if (!empty($lang))
         {
+            $lang->flag = base_url()."uploads/flag/".strtolower( $lang->country_code ).".png";
             $this->set_response($lang, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
         }
         else

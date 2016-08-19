@@ -14,5 +14,13 @@ class User extends Mingual_Model
 		parent::__construct();
 	}
 
+	public function check_login( $token )
+	{
+		$exists = $this->getItems( "`token`='".$token."'" );
+		if( count($exists) > 0 )
+			return true;
+		
+		return false;
+	}
 }
 ?>
