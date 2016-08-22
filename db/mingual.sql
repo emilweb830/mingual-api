@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Aug 12, 2016 at 05:27 AM
+-- Generation Time: Aug 22, 2016 at 11:07 AM
 -- Server version: 5.5.42
 -- PHP Version: 5.6.10
 
@@ -316,7 +316,8 @@ CREATE TABLE `minguals` (
   `id` int(255) unsigned NOT NULL,
   `id_partner1` int(255) unsigned NOT NULL,
   `id_partner2` int(255) unsigned NOT NULL,
-  `id_lang` int(10) unsigned NOT NULL,
+  `mingual_status1` int(2) unsigned NOT NULL COMMENT 'flag of partner1',
+  `mingual_status2` int(2) NOT NULL,
   `status` int(2) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -359,15 +360,9 @@ CREATE TABLE `settings` (
   `new_partner` int(2) NOT NULL,
   `new_message` int(2) NOT NULL,
   `vibration` int(2) NOT NULL,
-  `alert` int(2) NOT NULL
+  `alert` int(2) NOT NULL,
+  `show_me` int(2) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `settings`
---
-
-INSERT INTO `settings` (`id`, `id_user`, `new_partner`, `new_message`, `vibration`, `alert`) VALUES
-(1, 1, 1, 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -382,6 +377,7 @@ CREATE TABLE `users` (
   `longitude` varchar(32) NOT NULL,
   `first_name` varchar(32) CHARACTER SET utf8 NOT NULL,
   `last_name` varchar(32) CHARACTER SET utf8 NOT NULL,
+  `email` varchar(64) CHARACTER SET utf8 NOT NULL,
   `gender` varchar(2) NOT NULL,
   `date_add` datetime NOT NULL,
   `date_modified` datetime NOT NULL,
@@ -392,15 +388,9 @@ CREATE TABLE `users` (
   `learn_lang` int(8) NOT NULL,
   `about_me` text CHARACTER SET utf8 NOT NULL,
   `experience` text CHARACTER SET utf8 NOT NULL,
+  `token` varchar(64) NOT NULL,
   `active` int(2) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id_user`, `facebook_id`, `latitude`, `longitude`, `first_name`, `last_name`, `gender`, `date_add`, `date_modified`, `age`, `id_country`, `hometown`, `teach_lang`, `learn_lang`, `about_me`, `experience`, `active`) VALUES
-(1, '2020202', '15.1515', '16.1616', 'Test', 'User', '1', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 24, 15, 'HomeTown, HT', 1, 2, '', '', 1);
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
@@ -487,7 +477,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(255) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+  MODIFY `id_user` int(255) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=14;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

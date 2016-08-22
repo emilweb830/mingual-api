@@ -35,7 +35,7 @@ class Users extends REST_Controller {
                 'status'    => false,
                 'message'   => "Invalid Acccess."
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-        }*/     
+        }*/
     }
 
     public function index_get()

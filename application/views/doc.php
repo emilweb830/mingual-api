@@ -73,11 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	<div id="body">
 
 	<pre>
-		* request header
-			Content-Type: application/json
-			Token : $token
-			
-		- get language list
+		- get language list - done
 			path: 	/api/languages/(:id)
 			type: 	GET
 			params: 
@@ -87,7 +83,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				{"id_lang":2,"name":"Russian","iso_code":"ru","language_code":"ru","active":1}
 			]
 			
-		- get Country list
+		- get Country list - done
 			path: /api/countries/(:id)
 			type: 	GET
 			return: 
@@ -96,7 +92,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				{"id_country":2,"country_code":"AL","country_name":"Albania","flag":"http:\/\/mingual.com\/uploads\/flag\/al.png"}
 			]
 			
-		- Facebook Login
+		- Facebook Login - done
 			path: 	/api/users/login
 			type: 	GET
 			params: access_token
@@ -109,16 +105,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			params: token
 			return: {"status":true,"message":"Logout success."}
 			
-		- Update User profile
-			path: 	/api/users/(:id)
-			type: 	PUT
-			params: profileinfo ( example: {"latitude": "15.131543","longitude" : "15.2323"} )
+		- Update User profile - done
+			Path: 	/api/users/(:id)
+			Header: Token
+			Type: 	PUT
+			Params: profileinfo ( example: {"latitude": "15.131543","longitude" : "15.2323"} )
 					field list
 					latitude 	: string
 					longitude 	: string
 					first_name 	: string
 					last_name	: string
-					gender		: char( m, w )
+					gender		: char( m, f )
 					age			: int
 					id_country	: int
 					hometown	: string
@@ -129,11 +126,87 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					
 			return: 
 				{"status":true,"message":"Update Success."}
-		- Get User Profile
-			path: 	/api/users/(:id)
-			type: 	GET
-			params: empty
-			{"id_user":2,"facebook_id":10153946108396312,"latitude":15.131543,"longitude":15.2323,"first_name":"Michael","last_name":"Hochberg","gender":"m","age":10,"id_country":142,"hometown":"Mexico City","teach_lang":0,"learn_lang":0,"about_me":"","experience":"","active":1}
+
+		- Update Photo ***
+			Path: 	/api/profile/photo
+			Header: Token
+			Type: 	PUT
+			Params: 
+
+		- Get My Profile
+			Path: 	/api/profile/me
+			Header: Token
+			Type: 	GET
+			Params: none
+
+		- Local Search
+			Path: /api/users/local
+			Header: Token
+			Type: GET
+			Params: gender, age_low, age_high, teach_lang, learn_lang, dist
+			Return: Array of Users
+
+		- Global Seach
+			Path: /api/users/global
+			Header: Token
+			Type: GET
+			Params: gender, age_low, age_high, teach_lang, learn_lang, hometown
+
+		- Get User Setting
+			Path: /api/profile/setting
+			Header: Token
+			Type: GET
+			Params: none
+			Return: array of user setting
+
+		- Update User Setting
+			Path: /api/profile/setting
+			Header: Token
+			Type: PUT
+			Params: new_partner, new_messsage, vibration, alert, show_me
+			Return: status
+
+		- Delete Account
+			Path: /api/profile/delete
+			Header: Token
+			Type: Delete
+			Params: none
+			Return: status
+
+		- Contact US
+			Path: /api/contactus
+			Header: Token
+			Type: POST
+			Params: comment
+			Return: status
+
+		- Mingual
+			Path: /api/mingual/connect
+			Header: Token
+			Type: PUT
+			Params: partner_id
+			return: status
+
+		- Get User partner list
+			Path: /api/mingual/partners
+			Header: Token
+			Type: GET
+			Params: page_num
+			Return: array of partners
+
+		- Unmatch
+			Path: /api/mingual/unmatch
+			Header: Token
+			Type: PUT
+			Params: partnerID
+			Return: status
+
+		- Report
+			Path: /api/users/report
+			Header: Token
+			Type: POST
+			Params: report_type, comment, date_add
+
 	</pre>
 	<!--p>	To See All Pokemons : <a href='<?php echo base_url()?>manage/displayPokemons'> Click Here </a></p>
 	<p>	To See All Pokemon Types : <a href='<?php echo base_url()?>manage/displayPokemonTypes'> Click Here </a></p>
