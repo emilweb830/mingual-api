@@ -14,5 +14,16 @@ class Mingual extends Mingual_Model
 		parent::__construct();
 	}
 
+	public function makeMingual( $id_user, $partner_id )
+	{
+		return true;
+	}
+
+	public function unmatch( $partner_id )
+	{
+		return true;
+	}
+
+	public function getPartnerList( $id_user )
 }
 ?>

@@ -34,7 +34,7 @@ class Countries extends REST_Controller {
                 $this->response([
                     'status' => FALSE,
                     'message' => 'No country were found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
             }
         }
         
@@ -43,7 +43,7 @@ class Countries extends REST_Controller {
         if ( $id_country <= 0 )
         {
             // Invalid id, set the response and exit.
-            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+            $this->response(NULL, REST_Controller::HTTP_OK); // BAD_REQUEST (400) being the HTTP response code
         }
 
         $lang = $this->Country->getItemById( $id_country );
@@ -57,7 +57,7 @@ class Countries extends REST_Controller {
             $this->set_response([
                 'status' => FALSE,
                 'message' => 'User could not be found'
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
         }
     }
 

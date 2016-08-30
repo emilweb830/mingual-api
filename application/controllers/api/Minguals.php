@@ -1,0 +1,71 @@
+<?php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+// This can be removed if you use __autoload() in config.php OR use Modular Extensions
+require APPPATH . '/controllers/api/Mingual_Controller.php';
+
+class Minguals extends Mingual_Controller {
+
+    function __construct()
+    {
+        // Construct the parent class
+        parent::__construct();
+    }
+
+    public function connect_put()
+    {
+    	$id_user = parent::checkPermission();
+    	$partner_id = $this->put( 'partner_id' );
+    	
+    	if( !$partner_id )
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => $this->lang->line("message_invalid_params")
+            ], REST_Controller::HTTP_OK);
+        }
+
+        $status = $this->Mingual->makeMingual( $id_user, $partner_id );
+    	if( $status )
+        	$message = "Congurats";
+        else
+        	$message = "Error";
+
+        $this->response([
+            'status'    => $status,
+            'message'   => $message
+        ], REST_Controller::HTTP_OK);
+    }
+
+    public function partners_get()
+    {
+    	echo "partners";
+    }
+
+    public function unmatch_put()
+    {
+		$id_user = parent::checkPermission();
+    	$partner_id = $this->put( 'partner_id' );
+    	
+    	if( !$partner_id )
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => $this->lang->line("message_invalid_params")
+            ], REST_Controller::HTTP_OK);
+        }
+
+        $status = $this->Mingual->unmatch( $partner_id );
+    	if( $status )
+        	$message = "Congurats";
+        else
+        	$message = "Error";
+
+        $this->response([
+            'status'    => $status,
+            'message'   => $message
+        ], REST_Controller::HTTP_OK);    
+   	}
+}
+?>

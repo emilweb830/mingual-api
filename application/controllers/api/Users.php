@@ -3,7 +3,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
-require APPPATH . '/libraries/REST_Controller.php';
+require APPPATH . '/controllers/api/Mingual_Controller.php';
 
 use Facebook\Facebook as FB;
 use Facebook\Authentication\AccessToken;
@@ -15,76 +15,88 @@ use Facebook\Helpers\FacebookJavaScriptHelper;
 use Facebook\Helpers\FacebookPageTabHelper;
 use Facebook\Helpers\FacebookRedirectLoginHelper;
 
-class Users extends REST_Controller {
+class Users extends Mingual_Controller {
 
     function __construct()
     {
         // Construct the parent class
         parent::__construct();
-        $this->load->model('User');
-        $this->load->model('Country');
-        
-        if( !strcmp( $this->uri->segment(3, 0), "login") )
-            return;
-
-        $headers = getallheaders();
-        /*$token = isset( $headers['Token'])? $headers['Token'] : "";
-        if( !$id_user = $this->User->check_login( $token ) && $token != "" )
-        {
-            $this->response([
-                'status'    => false,
-                'message'   => "Invalid Acccess."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-        }*/
+        $this->load->helper('url');
     }
 
-    public function index_get()
+    public function profile_get()
     {
-        $id_user = $this->get('id');
-
-        if( $id_user == NULL )
+        $id_user    = parent::checkPermission();
+        if( $id_user == 0 )
         {
-            $arrUsers = $this->User->getItems();
-
-            if( !empty($arrUsers) )
-            {
-                foreach( $arrUsers as $v)
-                    unset( $v->token );
-
-                $this->response($arrUsers, REST_Controller::HTTP_OK);
-            }
-            else
-            {
-                $this->response([
-                    'status' => FALSE,
-                    'message' => 'No User were found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            }
+            $this->response([
+                'status' => FALSE,
+                'message' => 'No Registered'
+            ], REST_Controller::HTTP_OK);
         }
-        
-        $id_user = (int) $id_user;
-
-        if ( $id_user <= 0 )
-        {
-            // Invalid id, set the response and exit.
-            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
-        }
-
-        $lang = $this->User->getItemById( $id_user );
-        if (!empty($lang))
-        {
-            unset( $lang->token );
-            $this->set_response($lang, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
-        }
+        $user = $this->User->getFullProfileById( $id_user );
+        $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
+        if( !empty($user) )
+            $this->set_response( $user, REST_Controller::HTTP_OK ); // OK (200) being the HTTP response code
         else
         {
             $this->set_response([
                 'status' => FALSE,
-                'message' => 'User could not be found'
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+                'message' => 'No Registered User'
+            ], REST_Controller::HTTP_OK);
+            
         }
     }
-    
+
+    public function profile_put()
+    {
+        // TODO : photo update
+        $id_user    = parent::checkPermission();
+        $userData   = $this->put();
+        if( empty($userData) )
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => "Empty Fields."
+            ], REST_Controller::HTTP_OK);
+        }
+        $userData['id_user'] = $id_user;
+
+        if( $this->User->updateItem( $userData ))
+        {
+            $this->response([
+                'status'    => true,
+                'message'   => "Update Success."
+            ], REST_Controller::HTTP_OK);
+        }
+        else
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => "Update Error."
+            ], REST_Controller::HTTP_OK);
+        }
+    }
+
+    public function profile_delete()
+    {
+        $id_user    = parent::checkPermission();
+        if( $this->User->updateItem( array( "id_user"=> $id_user,"token"=> "", "active" => 0 ) ) )
+        {
+            $this->response([
+                'status'    => true,
+                'message'   => "Account is deleted."
+            ], REST_Controller::HTTP_OK);
+        }
+        else
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => "Error"
+            ], REST_Controller::HTTP_OK);
+        }
+    }
+
     public function login_get()
     {
         $access_token = $this->get('access_token');
@@ -99,11 +111,17 @@ class Users extends REST_Controller {
           // Returns a `Facebook\FacebookResponse` object
           $response = $this->fb->get('/me?fields=id,name,email,gender,birthday,first_name,last_name,about,location,hometown,picture', $access_token);
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
-          echo 'Graph returned an error: ' . $e->getMessage();
-          exit;
+            $this->response([
+                'status' => FALSE,
+                'message' => 'Graph returned an error: ' . $e->getMessage()
+            ], REST_Controller::HTTP_OK); 
+            exit;
         } catch(Facebook\Exceptions\FacebookSDKException $e) {
-          echo 'Facebook SDK returned an error: ' . $e->getMessage();
-          exit;
+            $this->response([
+                'status' => FALSE,
+                'message' => 'Facebook SDK returned an error: ' . $e->getMessage()
+            ], REST_Controller::HTTP_OK); 
+            exit;
         }
 
         $user = $response->getGraphUser();
@@ -137,22 +155,22 @@ class Users extends REST_Controller {
             
             $token  = md5( $arrProfile['facebook_id'] . $arrProfile['first_name'] );
             $this->User->updateItem( array( "id_user"=> $exists->id_user, "token"=> $token ) );
-            
+            $this->Setting->createDefaultSetting( $exists->id_user );
             $this->response([
                 'status'    => TRUE,
                 'id_user'   => $exists->id_user,
                 'token'     => $token
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            //exit;
+            ], REST_Controller::HTTP_OK); 
         }
         
         if( $id = $this->User->addItem( $arrProfile ))
         {
+            $this->Setting->createDefaultSetting( $id );
             $this->set_response([
                 'status' => TRUE,
                 'id_user'   => $id,
                 'token' => $arrProfile['token']
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            ], REST_Controller::HTTP_OK); 
             
         }
         else
@@ -160,69 +178,186 @@ class Users extends REST_Controller {
             $this->set_response([
                 'status' => FALSE,
                 'message' => "Login Error!"
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            ], REST_Controller::HTTP_OK); 
 
         }
     }
     
     public function logout_get()
     {
-        $token = $this->get('token');
-        if( !$id_user = $this->User->check_login( $token ) )
-        {
-            $this->response([
-                'status'    => false,
-                'message'   => "Unauthorized user."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-        }
+        $id_user = parent::checkPermission();
         
         if( $this->User->updateItem( array( "id_user"=> $id_user,"token"=> "" ) ) )
         {
             $this->response([
                 'status'    => true,
                 'message'   => "Logout success."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            ], REST_Controller::HTTP_OK);
         }
         else
         {
             $this->response([
                 'status'    => false,
                 'message'   => "Logout Error."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            ], REST_Controller::HTTP_OK);
         }
     }
-    
-    // update user profile
-    public function index_put()
+
+    public function report_put()
     {
-        $id_user    = $this->get('id');
-        $userData   = $this->put();
-        if( empty($userData) )
+        $id_user = parent::checkPermission();
+        $input = $this->put();
+
+        if( !isset($input['report_type']) || !isset($input['comment']) )
         {
             $this->response([
                 'status'    => false,
-                'message'   => "Empty Fields."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+                'message'   => $this->lang->line("message_invalid_params")
+            ], REST_Controller::HTTP_OK);
         }
-        $userData['id_user'] = $id_user;
-        if( $this->User->updateItem( $userData ))
+        $arrReport = array(
+                "id_user"       => $id_user,
+                "report_type"   => $input['report_type'],
+                "comment"       => $input['comment'],
+                "date_add"      => date("Y-m-d h:i:s")
+            );
+
+        if( $this->Report->addItem( $arrReport ) )
         {
             $this->response([
                 'status'    => true,
-                'message'   => "Update Success."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+                'message'   => "Success."
+            ], REST_Controller::HTTP_OK);
+
+        }
+        else
+        {
+             $this->response([
+                'status'    => false,
+                'message'   => "Failed."
+            ], REST_Controller::HTTP_OK);
+        }
+    }
+
+    public function contactus_post()
+    {
+        $id_user = parent::checkPermission();
+        $input = $this->post();
+
+        if( !isset($input['comment']) )
+        {
+            $this->response([
+                'status'    => false,
+                'message'   => $this->lang->line("message_invalid_params")
+            ], REST_Controller::HTTP_OK);
+        }
+
+        $message = "Contact Us test";
+
+        if( mail( $this->config->item('support_email'), "Contact us", $message ) )
+        {
+            $this->response([
+                'status'    => true,
+                'message'   => "Message sent."
+            ], REST_Controller::HTTP_OK);
+
+        }
+        else
+        {
+             $this->response([
+                'status'    => false,
+                'message'   => "Failed."
+            ], REST_Controller::HTTP_OK);
+        }
+    }
+
+    public function search_get()
+    {
+        // check permission and get authenticated user ID
+        $id_user = parent::checkPermission();
+
+        // load search setting 
+        $setting = $this->Setting->getItems("`id_user`=".$id_user, true );
+
+        // parse search params
+        $offset = $this->get('offset');
+        if( $offset == NULL )
+            $offset = 0;
+        $users = $this->User->searchUserBySetting( $id_user, $setting, $offset );
+
+        if( empty( $users ) || count( $users ) < 1 )
+        {
+            $this->response([
+                'status'    => true,
+                'message'   => "No Matched User."
+            ], REST_Controller::HTTP_OK);
         }
         else
         {
             $this->response([
-                'status'    => false,
-                'message'   => "Update Error."
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+                'status'    => true,
+                'count'     => $users['count'],
+                'offset'    => $users['offset'],
+                'users'      => $users['data']
+            ], REST_Controller::HTTP_OK);
+
         }
-//      foreach( $userData as $key => $value){
-            
-//      }
     }
+
+    public function index_get()
+    {
+        $id_user = $this->get('id');
+
+        if( $id_user == NULL )
+        {
+            $arrUsers = $this->User->getItems();
+
+            if( !empty($arrUsers) )
+            {
+                foreach( $arrUsers as &$v){
+                    $v = $this->User->getFullProfileById( $id_user );
+                    //$v->country->flag = base_url()."uploads/flag/".strtolower( $v->country->country_code ).".png";
+
+                    unset( $v->token );
+                }
+
+                $this->response($arrUsers, REST_Controller::HTTP_OK);
+            }
+            else
+            {
+                $this->response([
+                    'status' => FALSE,
+                    'message' => 'No User were found'
+                ], REST_Controller::HTTP_OK);
+            }
+        }
+        
+        $id_user = (int) $id_user;
+
+        if ( $id_user <= 0 )
+        {
+            // Invalid id, set the response and exit.
+            $this->response(NULL, REST_Controller::HTTP_OK); 
+        }
+
+        //$lang = $this->User->getItemById( $id_user );
+        $user = $this->User->getFullProfileById( $id_user );
+        $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
+
+        if (!empty($user))
+        {
+            unset( $user->token );
+            $this->set_response($user, REST_Controller::HTTP_OK);
+        }
+        else
+        {
+            $this->set_response([
+                'status' => FALSE,
+                'message' => 'User could not be found'
+            ], REST_Controller::HTTP_OK); 
+        }
+    }
+        
 }
 
 ?>

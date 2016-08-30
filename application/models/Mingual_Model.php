@@ -14,9 +14,9 @@ class Mingual_Model extends CI_Model
 		$this->_db = $this->load->database('default', TRUE);
 		$this->_db->from( $this->table_name );
 		if( $this->order_by_field )
-			$this->_db->order_by( $this->order_by_field, $this->order_by_type);
+			$this->_db->order_by( $this->table_name.".".$this->order_by_field, $this->order_by_type);
 		else
-			$this->_db->order_by( $this->primary_key, $this->order_by_type);
+			$this->_db->order_by( $this->table_name.".".$this->primary_key, $this->order_by_type);
 	}
 
 	public function getItems( $where = '', $first = false ){
