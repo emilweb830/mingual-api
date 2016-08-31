@@ -138,7 +138,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			return: 
 				{"status":true,"message":"Update Success."}
 
-		- Search
+		- Search - done
 			Path: /api/users/search
 			Header: Token
 			Type: GET
@@ -255,26 +255,91 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			Params: comment
 			Return: status
 
-		- Mingual
+		- Mingual - done
 			Path: /api/minguals/connect
 			Header: Token
 			Type: PUT
 			Params: partner_id
-			return: status
+			return: {"status":true,"message":"Congurats"}
 
-		- Get User partner list
+		- Get User partner list -done
 			Path: /api/minguals/partners
 			Header: Token
 			Type: GET
 			Params: page_num
-			Return: array of partners
+			Return: {
+			  "status": true,
+			  "count": 4,
+			  "offset": 0,
+			  "users": [
+			    {
+			      "id_user": 16,
+			      "facebook_id": 101539461083333,
+			      "latitude": 15.1313,
+			      "longitude": 15.23,
+			      "first_name": "Test",
+			      "last_name": "Three",
+			      "email": "",
+			      "gender": "f",
+			      "date_add": "2016-08-20 03:59:44",
+			      "date_modified": "2016-08-20 03:59:44",
+			      "age": 26,
+			      "hometown": "Mexico City",
+			      "teach_lang": {
+			        "id_lang": 2,
+			        "name": "Russian",
+			        "iso_code": "ru",
+			        "language_code": "ru",
+			        "active": 1
+			      },
+			      "learn_lang": {
+			        "id_lang": 2,
+			        "name": "Russian",
+			        "iso_code": "ru",
+			        "language_code": "ru",
+			        "active": 1
+			      },
+			      "about_me": "",
+			      "experience": "",
+			      "token": "",
+			      "active": 1,
+			      "country": {
+			        "id_country": 142,
+			        "country_code": "MX",
+			        "country_name": "Mexico"
+			      },
+			      "photos": null
+			    },
+			    {
+			      "id_user": 15,
+			      "facebook_id": 101539461083313,
+			      "latitude": 15.1313,
+			      "longitude": 15.23,
+			      ...			     
+			    },
+			    {
+			      "id_user": 16,
+			      "facebook_id": 101539461083333,
+			      "latitude": 15.1313,
+			      "longitude": 15.23,
+			      ...
+			    },
+			    {
+			      "id_user": 17,
+			      "facebook_id": 101539461084444,
+			      "latitude": 15.1313,
+			      "longitude": 15.23,
+			      ...
+			    }
+			  ]
+			}
 
-		- Unmatch
+		- Unmatch - done
 			Path: /api/minguals/unmatch
 			Header: Token
 			Type: PUT
 			Params: partner_id
-			Return: status
+			Return: {"status":true,"message":"Congurats"}
 
 		- Report - done
 			Path: /api/users/report

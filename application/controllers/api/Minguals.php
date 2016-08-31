@@ -40,7 +40,30 @@ class Minguals extends Mingual_Controller {
 
     public function partners_get()
     {
-    	echo "partners";
+    	$id_user = parent::checkPermission();
+    	
+        $offset = $this->get('offset');
+        if( $offset == NULL )
+            $offset = 0;
+
+    	$partners = $this->Mingual->getPartnerList( $id_user, $offset );
+
+        if( empty( $partners ) || count( $partners ) < 1 )
+        {
+            $this->response([
+                'status'    => true,
+                'message'   => "No Matched User."
+            ], REST_Controller::HTTP_OK);
+        }
+        else
+        {
+            $this->response([
+                'status'    => true,
+                'count'     => $partners['count'],
+                'offset'    => $partners['offset'],
+                'partners'  => $partners['data']
+            ], REST_Controller::HTTP_OK);
+        }
     }
 
     public function unmatch_put()
@@ -56,7 +79,7 @@ class Minguals extends Mingual_Controller {
             ], REST_Controller::HTTP_OK);
         }
 
-        $status = $this->Mingual->unmatch( $partner_id );
+        $status = $this->Mingual->unmatch( $id_user, $partner_id );
     	if( $status )
         	$message = "Congurats";
         else

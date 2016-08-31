@@ -592,3 +592,5 @@ $config['allow_any_cors_domain'] = FALSE;
 |
 */
 $config['allowed_cors_origins'] = [];
+
+$config['rows_per_page'] = 10;

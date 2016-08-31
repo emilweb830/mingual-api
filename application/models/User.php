@@ -76,8 +76,7 @@ class User extends Mingual_Model
 
 		$this->_db->where( $where );
 		$count = 0;
-		$new_db = $this->_db;
-		$count = $new_db->count_all_results();
+		$count = $this->_db->count_all_results();
 
 		/* get the result */ 
 		$this->__construct();
@@ -87,9 +86,9 @@ class User extends Mingual_Model
 		$this->_db->where( $where );
 
 		if( $offset > 0 )
-			$this->_db->limit(10, $offset);
+			$this->_db->limit( $this->config->item('rows_per_page') , $offset);
 		else
-			$this->_db->limit(10);
+			$this->_db->limit( $this->config->item('rows_per_page') );
 
 		$query = $this->_db->get();
 		if($query->num_rows() > 0)
