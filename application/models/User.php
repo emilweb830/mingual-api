@@ -27,6 +27,9 @@ class User extends Mingual_Model
 	public function getFullProfileById( $id_user )
 	{
 		$user = $this->getItems( "id_user=". $id_user. " AND active=1", true );
+		if( empty( $user ) || count($user) < 1)
+			return false;
+
 		$user->country = $this->Country->getItemById( $user->id_country );
 		unset( $user->id_country );
 

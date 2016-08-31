@@ -26,7 +26,7 @@ class Countries extends REST_Controller {
             if( !empty($arrCountries) )
             {
                 foreach( $arrCountries as &$country )
-                    $country->flag = base_url()."uploads/flag/".strtolower( $country->country_code ).".png";
+                    $country->flag = $this->Country->getFlagUrl( $country->country_code );
                 $this->response($arrCountries, REST_Controller::HTTP_OK);
             }
             else
@@ -46,17 +46,17 @@ class Countries extends REST_Controller {
             $this->response(NULL, REST_Controller::HTTP_OK); // BAD_REQUEST (400) being the HTTP response code
         }
 
-        $lang = $this->Country->getItemById( $id_country );
-        if (!empty($lang))
+        $country = $this->Country->getItemById( $id_country );
+        if (!empty($country))
         {
-            $lang->flag = base_url()."uploads/flag/".strtolower( $lang->country_code ).".png";
-            $this->set_response($lang, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+            $country->flag = $this->Country->getFlagUrl( $country->country_code ); //base_url()."uploads/flag/".strtolower( $country->country_code ).".png";
+            $this->set_response($country, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
         }
         else
         {
             $this->set_response([
                 'status' => FALSE,
-                'message' => 'User could not be found'
+                'message' => 'Country could not be found'
             ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
         }
     }

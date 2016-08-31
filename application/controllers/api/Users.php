@@ -35,9 +35,10 @@ class Users extends Mingual_Controller {
             ], REST_Controller::HTTP_OK);
         }
         $user = $this->User->getFullProfileById( $id_user );
-        $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
-        if( !empty($user) )
-            $this->set_response( $user, REST_Controller::HTTP_OK ); // OK (200) being the HTTP response code
+        if( !empty($user) ){
+            $user->country->flag = $this->Country->getFlagUrl( $user->country->country_code );
+            $this->set_response( $user, REST_Controller::HTTP_OK );
+        }
         else
         {
             $this->set_response([
@@ -314,10 +315,13 @@ class Users extends Mingual_Controller {
 
             if( !empty($arrUsers) )
             {
-                foreach( $arrUsers as &$v){
-                    $v = $this->User->getFullProfileById( $id_user );
-                    //$v->country->flag = base_url()."uploads/flag/".strtolower( $v->country->country_code ).".png";
+                foreach( $arrUsers as &$v)
+                {
+                    $v = $this->User->getFullProfileById( $v->id_user );
+                    if( !$v )
+                        continue;
 
+                    $v->country->flag = $this->Country->getFlagUrl( $v->country->country_code );
                     unset( $v->token );
                 }
 
@@ -331,21 +335,20 @@ class Users extends Mingual_Controller {
                 ], REST_Controller::HTTP_OK);
             }
         }
-        
+
         $id_user = (int) $id_user;
 
-        if ( $id_user <= 0 )
-        {
-            // Invalid id, set the response and exit.
-            $this->response(NULL, REST_Controller::HTTP_OK); 
+        if ( $id_user <= 0 ){
+            $this->response([
+                    'status' => FALSE,
+                    'message' => $this->lang->line("message_invalid_params")
+                ], REST_Controller::HTTP_OK);
         }
 
-        //$lang = $this->User->getItemById( $id_user );
         $user = $this->User->getFullProfileById( $id_user );
-        $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
-
         if (!empty($user))
         {
+            $user->country->flag = $this->Country->getFlagUrl( $user->country->country_code );
             unset( $user->token );
             $this->set_response($user, REST_Controller::HTTP_OK);
         }
@@ -357,7 +360,6 @@ class Users extends Mingual_Controller {
             ], REST_Controller::HTTP_OK); 
         }
     }
-        
-}
 
+}
 ?>
