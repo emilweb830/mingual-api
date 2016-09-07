@@ -68,5 +68,6 @@ $route['api/example/users/(:num)(\.)([a-zA-Z0-9_-]+)(.*)'] = 'api/example/users/
 // General routers
 $route['api/(:any)/(:num)'] 	= 'api/$1/index/id/$2';
 $route['api/profile/me']		= 'api/users/profile';
+$route['api/profile/photo']		= 'api/users/photo';
 $route['api/profile/setting']	= 'api/settings';
 $route['api/contactus']			= 'api/users/contactus';

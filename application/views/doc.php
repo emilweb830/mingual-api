@@ -347,12 +347,33 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			Header: Token
 			Type: PUT
 			Params: report_type, comment, date_add
-		
+			Return: {"status":true,"message":"Success."}
+
 		- Get Users - done
 			Path: /api/users/(:id)
 			Header: Token
 			Type: GET
 			Params: none
+			Return: {
+			  "status": true,
+			  "info": {
+				  "id_user": 13,
+				  "facebook_id": 10153946108396312,
+				  "latitude": 15.131543,
+				  "longitude": 15.23,
+				  "first_name": "Michael",
+				  "last_name": "Hochberg",
+				  ...
+				}
+
+
+		- Upload Photos
+			path: /api/profile/photo
+			Header: Token
+			Type: POST
+			Params: photo1 : FILE
+					photo2 : FILE
+			return: {"status":true,"photo_ids":[8,9]}
 	</pre>
 	<!--p>	To See All Pokemons : <a href='<?php echo base_url()?>manage/displayPokemons'> Click Here </a></p>
 	<p>	To See All Pokemon Types : <a href='<?php echo base_url()?>manage/displayPokemonTypes'> Click Here </a></p>

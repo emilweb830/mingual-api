@@ -62,6 +62,14 @@ class Users extends Mingual_Controller {
         }
         $userData['id_user'] = $id_user;
 
+        if( isset($userData['photos']))
+        {
+            foreach( $userData['photos'] as $id_photo )
+                $this->Photo->updateItem( array( "id_photo"=>$id_photo, "id_user"=>$id_user ) );
+
+            unset( $userData['photos']);
+        }
+
         if( $this->User->updateItem( $userData ))
         {
             $this->response([
@@ -342,12 +350,11 @@ class Users extends Mingual_Controller {
 
         //$lang = $this->User->getItemById( $id_user );
         $user = $this->User->getFullProfileById( $id_user );
-        $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
-
         if (!empty($user))
         {
+            $user->country->flag = base_url()."uploads/flag/".strtolower( $user->country->country_code ).".png";
             unset( $user->token );
-            $this->set_response($user, REST_Controller::HTTP_OK);
+            $this->set_response(array("status"=>TRUE,"info"=>$user), REST_Controller::HTTP_OK);
         }
         else
         {
@@ -357,7 +364,61 @@ class Users extends Mingual_Controller {
             ], REST_Controller::HTTP_OK); 
         }
     }
-        
+
+    public function photo_post()
+    {
+        $id_user = parent::checkPermission();
+
+        $config['upload_path'] = 'uploads/photos/';
+        $path=$config['upload_path'];
+        $config['allowed_types'] = 'gif|jpg|jpeg|png';
+        $config['max_size'] = '1024';
+        $config['max_width'] = '1920';
+        $config['max_height'] = '1280';
+        $this->load->library('upload', $config);
+
+        if( empty( $_FILES ) )
+        {
+            $this->response([
+                'status' => FALSE,
+                'message' => 'Empty Files'
+            ], REST_Controller::HTTP_OK);
+        }
+        $photo_ids = array();
+        foreach ($_FILES as $fieldname => &$fileObject)  //fieldname is the form field name
+        {
+            if (!empty($fileObject['name']))
+            {
+                $fileObject['name'] = time()."_".$fileObject['name'];
+                $this->upload->initialize($config);
+                if (!$this->upload->do_upload($fieldname))
+                {
+                    $this->response(array("status"=>"error", "message" => strip_tags($this->upload->display_errors())), 200);
+                }
+                else
+                {
+                    $upload = $this->upload->data();
+                    $file_url = base_url()."uploads/photos/".$upload['file_name'];
+                    $photo_ids[] = $this->Photo->addItem(array("id_user"=>0, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));
+                }
+            }
+        }
+        if( empty( $photo_ids ) )
+        {
+            $this->response([
+                'status' => FALSE,
+                'message' => 'Uploading Error'
+            ], REST_Controller::HTTP_OK);
+        }
+        else
+        {
+            $this->response([
+                'status' => TRUE,
+                'photo_ids' => $photo_ids
+            ], REST_Controller::HTTP_OK);            
+        }
+    }
+
 }
 
 ?>
