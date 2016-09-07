@@ -10,7 +10,8 @@ class Minguals extends Mingual_Controller {
     function __construct()
     {
         // Construct the parent class
-        parent::__construct();
+        parent::__construct();        
+        $this->load->helper('url');
     }
 
     public function connect_put()
@@ -41,7 +42,7 @@ class Minguals extends Mingual_Controller {
     public function partners_get()
     {
     	$id_user = parent::checkPermission();
-    	
+
         $offset = $this->get('offset');
         if( $offset == NULL )
             $offset = 0;

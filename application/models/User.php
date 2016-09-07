@@ -38,6 +38,9 @@ class User extends Mingual_Model
 		$user->learn_lang = $this->Lang->getItemById( $user->learn_lang );
 
 		$user->photos = $this->Photo->getItems( "id_user=".$id_user );
+
+		$user->country->flag = $this->Country->getFlagUrl( $user->country->country_code );
+		
 		return $user;
 	}
 
@@ -65,7 +68,7 @@ class User extends Mingual_Model
             $where .= " AND `learn_lang`=".$arrOptions->id_learn_lang;
 
         if( $arrOptions->sch_city != "" && $arrOptions->sch_type == "g" )
-            $where .= " AND `hometown` like %'".$arrOptions->sch_city."'%";
+            $where .= " AND `hometown` like '%".$arrOptions->sch_city."%'";
 
         if( $arrOptions->sch_type == "l")
 	        // calculate distance as mile
@@ -97,6 +100,11 @@ class User extends Mingual_Model
 		if($query->num_rows() > 0)
 		{
 			$rows = $query->result();
+			foreach( $rows as &$v){
+				$v = $this->getFullProfileById( $v->id_user );
+				$v->distance 	= 3959 * 2 * ASIN(SQRT( POW(SIN(($lat - $v->latitude) * pi()/180 / 2), 2) + COS($lat * pi()/180) * COS( $v->latitude * pi()/180) * POW(SIN(($lon - $v->longitude) * pi()/180 / 2), 2) ));
+			}
+
 			return array( "count" => $count, "offset"=>$offset, "data"=> $rows );
 		}
 

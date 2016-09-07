@@ -14,7 +14,7 @@ class Country extends Mingual_Model
 		parent::__construct();
 	}
 
-	public function getFlagUrl( $code)
+	public function getFlagUrl( $code )
 	{
 		return base_url()."uploads/flag/".strtolower( $code ).".png";
 	}
