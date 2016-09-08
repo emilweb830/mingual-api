@@ -261,13 +261,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			Header: Token
 			Type: PUT
 			Params: partner_id
-			return: {"status":true,"message":"Congurats"}
+			return: failed: {"status":false,"message":"Already mingualed with that user."}
+					success: {"status":true,"mingual_status":false}
 
 		- Get User partner list -done
 			Path: /api/minguals/partners
 			Header: Token
 			Type: GET
-			Params: page_num
+			Params: offset
 			Return: {
 			  "status": true,
 			  "count": 4,
@@ -346,7 +347,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			Path: /api/users/report
 			Header: Token
 			Type: PUT
-			Params: report_type, comment, date_add
+			Params: report_type, comment, report_userID,date_add
 			Return: {"status":true,"message":"Success."}
 
 		- Get Users - done
@@ -371,9 +372,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			path: /api/profile/photo
 			Header: Token
 			Type: POST
-			Params: photo1 : FILE
-					photo2 : FILE
-			return: {"status":true,"photo_ids":[8,9]}
+			Params: photo : FILE
+			return: {"status":true,"photo_id":6}
 	</pre>
 	<!--p>	To See All Pokemons : <a href='<?php echo base_url()?>manage/displayPokemons'> Click Here </a></p>
 	<p>	To See All Pokemon Types : <a href='<?php echo base_url()?>manage/displayPokemonTypes'> Click Here </a></p>

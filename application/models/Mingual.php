@@ -17,26 +17,27 @@ class Mingual extends Mingual_Model
 		if( !empty($exist) && count($exist) > 0 )
 		{
 			if( $exist->status == 0 )
-				return false;
+				return array("status"=>false, "message"=>"Already unmatched each other."); 
 
 			if( $exist->id_partner1 == $id_user )
 			{
 				if( $exist->mingual_status1 == 1 )
-					return false;
+					return array("status"=>false, "message"=> "Already mingualed with that user."); 
+
 				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 1));
-				return true;
+				return array("status"=>true, "mingual"=> $this->getItemById($exist->id)); 
 			}
 			if( $exist->id_partner2 == $id_user )
 			{
 				if( $exist->mingual_status2 == 1 )
-					return false;
+					return array("status"=>false, "message"=> "Already mingualed with that user."); 
 				$this->updateItem(array("id" => $exist->id, "mingual_status2" => 1));
-				return true;
+				return array("status"=>true, "mingual"=> $this->getItemById($exist->id)); 
 			}
 		}
 
-		$this->addItem( array("id_partner1"=>$id_user, "id_partner2"=>$partner_id, "mingual_status1"=>1, "mingual_status2"=>0, "status"=>1));
-		return true;
+		$id = $this->addItem( array("id_partner1"=>$id_user, "id_partner2"=>$partner_id, "mingual_status1"=>1, "mingual_status2"=>0, "status"=>1));
+		return array("status"=>true, "mingual"=> $this->getItemById($id)); 
 	}
 
 	public function unmatch( $id_user, $partner_id )

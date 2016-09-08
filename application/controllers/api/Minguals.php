@@ -27,16 +27,17 @@ class Minguals extends Mingual_Controller {
             ], REST_Controller::HTTP_OK);
         }
 
-        $status = $this->Mingual->makeMingual( $id_user, $partner_id );
-    	if( $status )
-        	$message = "Congurats";
+        $return = $this->Mingual->makeMingual( $id_user, $partner_id );
+    	if( $return['status'] )
+            $this->response([
+                'status'    => TRUE,
+                'mingual_status'   => $return['mingual']->mingual_status1 && $return['mingual']->mingual_status2
+            ], REST_Controller::HTTP_OK);
         else
-        	$message = "Error";
-
-        $this->response([
-            'status'    => $status,
-            'message'   => $message
-        ], REST_Controller::HTTP_OK);
+            $this->response([
+                'status'    => FALSE,
+                'message'   => $return['message']
+            ], REST_Controller::HTTP_OK);
     }
 
     public function partners_get()

@@ -74,7 +74,7 @@ class Users extends Mingual_Controller {
         {
             $this->response([
                 'status'    => true,
-                'message'   => "Update Success."
+                'user_info'   => $this->User->getFullProfileById( $id_user ),
             ], REST_Controller::HTTP_OK);
         }
         else
@@ -226,6 +226,7 @@ class Users extends Mingual_Controller {
         $arrReport = array(
                 "id_user"       => $id_user,
                 "report_type"   => $input['report_type'],
+                "report_user"   => $input['report_userID'],
                 "comment"       => $input['comment'],
                 "date_add"      => date("Y-m-d h:i:s")
             );
@@ -384,10 +385,10 @@ class Users extends Mingual_Controller {
                 'message' => 'Empty Files'
             ], REST_Controller::HTTP_OK);
         }
-        $photo_ids = array();
+        $id_photo = 0;
         foreach ($_FILES as $fieldname => &$fileObject)  //fieldname is the form field name
         {
-            if (!empty($fileObject['name']))
+            if (!empty($fileObject['name']) && $fieldname=="photo")
             {
                 $fileObject['name'] = time()."_".$fileObject['name'];
                 $this->upload->initialize($config);
@@ -399,24 +400,19 @@ class Users extends Mingual_Controller {
                 {
                     $upload = $this->upload->data();
                     $file_url = base_url()."uploads/photos/".$upload['file_name'];
-                    $photo_ids[] = $this->Photo->addItem(array("id_user"=>0, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));
+                    $id_photo = $this->Photo->addItem(array("id_user"=>0, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));
+                    $this->response([
+                        'status' => TRUE,
+                        'photo_id' => $id_photo
+                    ], REST_Controller::HTTP_OK);            
+
                 }
             }
         }
-        if( empty( $photo_ids ) )
-        {
-            $this->response([
-                'status' => FALSE,
-                'message' => 'Uploading Error'
-            ], REST_Controller::HTTP_OK);
-        }
-        else
-        {
-            $this->response([
-                'status' => TRUE,
-                'photo_ids' => $photo_ids
-            ], REST_Controller::HTTP_OK);            
-        }
+        $this->response([
+            'status' => FALSE,
+            'message' => 'Uploading Error'
+        ], REST_Controller::HTTP_OK);
     }
 
 }
