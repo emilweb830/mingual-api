@@ -125,7 +125,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					longitude 	: string
 					first_name 	: string
 					last_name	: string
-					gender		: char( m, f )
+					gender		: char( m, f, b )
 					age			: int
 					id_country	: int
 					hometown	: string
@@ -156,7 +156,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			      "first_name": "Test",
 			      "last_name": "User",
 			      "email": "",
-			      "gender": 1,
+			      "gender": m,
 			      "date_add": "0000-00-00 00:00:00",
 			      "date_modified": "0000-00-00 00:00:00",
 			      "age": 24,
@@ -273,7 +273,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			  "status": true,
 			  "count": 4,
 			  "offset": 0,
-			  "users": [
+			  "partners": [
 			    {
 			      "id_user": 16,
 			      "facebook_id": 101539461083333,

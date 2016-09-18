@@ -117,7 +117,7 @@ class Users extends Mingual_Controller {
 
         try {
           // Returns a `Facebook\FacebookResponse` object
-          $response = $this->fb->get('/me?fields=id,name,email,gender,birthday,first_name,last_name,about,location,hometown,picture', $access_token);
+          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location,hometown,picture', $access_token);
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
             $this->response([
                 'status' => FALSE,
@@ -137,6 +137,7 @@ class Users extends Mingual_Controller {
         $arrProfile = array(
                 "facebook_id"   => $user['id'],
                 "gender"        => substr($user->getGender(), 0, 1),
+                "email"         => $user->getEmail(),
                 "first_name"    => $user->getFirstName(),
                 "last_name"     => $user->getLastName(),
                 "date_add"      => date("Y-m-d h:i:s"),
@@ -148,16 +149,48 @@ class Users extends Mingual_Controller {
                 "learn_lang"    => 0,
                 "about_me"      => "",
                 "experience"    => "",
-                "active"        => 1
-            
+                "active"        => 1            
             );
 
-        $location = $user['location']['name'];
-        list( $arrProfile['hometown'], $country ) = explode(", ", $location );
-        
-        $arrProfile['id_country'] = $this->Country->getItems("country_name='".$country."'", true)->id_country;
+        if( isset($user['age_range']['min']))
+            $arrProfile['age'] = $user['age_range']['min'];
+
+        if( isset($user['birthday']) )
+        {
+            $reponseBody = $response->getDecodedBody();
+            $birthday = $reponseBody['birthday'];
+
+            $birthDate = explode("/", $birthday);
+              //get age from date or birthdate
+            $age = (date("md", date("U", mktime(0, 0, 0, $birthDate[0], $birthDate[1], $birthDate[2]))) > date("md")
+                ? ((date("Y") - $birthDate[2]) - 1)
+                : (date("Y") - $birthDate[2]));
+            if( $age )
+                $arrProfile['age'] = $age;
+        }
+
+        if( isset( $user['location'])){
+            $location = $user['location']['name'];
+            $arrLocation = explode(", ", $location );
+
+            $arrProfile['hometown'] = "";
+            for( $i = 0; $i < count($arrLocation)-1; $i++ )
+            {
+                $arrProfile['hometown'] .= $arrLocation[$i] . " ";
+            }
+            $country = $arrLocation[count($arrLocation) -1 ];
+            $arrProfile['id_country'] = $this->Country->getItems("country_name='".$country."' OR country_code='".$country."'", true)->id_country;
+        }
+        else
+        {
+            $arrProfile['id_country'] = 0;
+            $arrProfile['hometown'] = "";
+        }
+
         $arrProfile['token']    = md5( $arrProfile['facebook_id'] . $arrProfile['first_name'] );
-        
+
+print_r( $user );
+exit;
         $exists = $this->User->getItems( "facebook_id='".$arrProfile['facebook_id']."'", true );
         if( count( $exists ) > 0 ){
             
@@ -173,6 +206,16 @@ class Users extends Mingual_Controller {
         
         if( $id = $this->User->addItem( $arrProfile ))
         {
+            $picture =  $user->getPicture(); 
+            $file_url = $picture['url']; 
+
+            $url = "https://graph.facebook.com/".$user['id']."/picture?type=large";
+            $headers = get_headers($url, 1);
+            if( isset($headers['Location']) )
+                $file_url = $headers['Location'];
+
+            $this->Photo->addItem(array("id_user"=>$id, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));  
+            
             $this->Setting->createDefaultSetting( $id );
             $this->set_response([
                 'status' => TRUE,
@@ -263,7 +306,7 @@ class Users extends Mingual_Controller {
 
         $message = "Contact Us test";
 
-        if( mail( $this->config->item('support_email'), "Contact us", $message ) )
+        if( mail( $this->config->item('support_email'), "Contact us on Mingual", $message ) )
         {
             $this->response([
                 'status'    => true,

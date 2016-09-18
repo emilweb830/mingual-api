@@ -512,4 +512,4 @@ $config['rewrite_short_tags'] = FALSE;
 */
 $config['proxy_ips'] = '';
 
-$config['support_email'] = "admin@mingual.com";
+$config['support_email'] = "Michael@mingual.com";

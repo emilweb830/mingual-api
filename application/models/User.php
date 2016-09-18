@@ -29,8 +29,8 @@ class User extends Mingual_Model
 		$user = $this->getItems( "id_user=". $id_user. " AND active=1", true );
 		if( empty( $user ) || count($user) < 1)
 			return false;
-
-		$user->country = $this->Country->getItemById( $user->id_country );
+		if( $user->id_country )
+			$user->country = $this->Country->getItemById( $user->id_country );
 		unset( $user->id_country );
 
 		$user->teach_lang = $this->Lang->getItemById( $user->teach_lang );
@@ -39,8 +39,11 @@ class User extends Mingual_Model
 
 		$user->photos = $this->Photo->getItems( "id_user=".$id_user );
 
-		$user->country->flag = $this->Country->getFlagUrl( $user->country->country_code );
+		if( isset($user->country) )
+			$user->country->flag = $this->Country->getFlagUrl( $user->country->country_code );
 		
+		if( isset( $user->token ) )
+			unset( $user->token );
 		return $user;
 	}
 
@@ -75,7 +78,9 @@ class User extends Mingual_Model
 	        // earth's radius: 6371 km, 3959 ml
 	        $where .= " AND 3959 * 2 * ASIN(SQRT( POW(SIN(($lat - ".$this->table_name.".latitude) * pi()/180 / 2), 2) + COS($lat * pi()/180) * COS(".$this->table_name.".latitude * pi()/180) * POW(SIN(($lon - ".$this->table_name.".longitude) * pi()/180 / 2), 2) )) < $r";
 
-        $where .= " AND `gender`='".$arrOptions->sch_gender."'";
+	    if( $arrOptions->sch_gender != "b")
+        	$where .= " AND `gender`='".$arrOptions->sch_gender."'";
+        
         $where .= " AND `age` > ". $arrOptions->sch_age_low." AND `age` < ".$arrOptions->sch_age_high;
         $where .= " AND `show_me`=1 AND active =1";
 		$where .= " AND !( (`id_partner1`='".$id_user."' && `mingual_status1`='1' && `id_partner2`=users.id_user) OR (`id_partner2`='".$id_user."' && `mingual_status2`='1' && `id_partner1`=users.id_user)) OR ( (`id_partner1` is NULL) && (`id_partner2` is NULL) )";

@@ -19,7 +19,7 @@ class Minguals extends Mingual_Controller {
     	$id_user = parent::checkPermission();
     	$partner_id = $this->put( 'partner_id' );
     	
-    	if( !$partner_id )
+    	if( !$partner_id || $id_user == $partner_id )
         {
             $this->response([
                 'status'    => false,
