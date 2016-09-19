@@ -145,8 +145,8 @@ class Users extends Mingual_Controller {
                 "latitude"      => "",
                 "longitude"     => "",
                 "age"           => 10,
-                "teach_lang"    => 0,
-                "learn_lang"    => 0,
+                "teach_lang"    => 2,
+                "learn_lang"    => 2,
                 "about_me"      => "",
                 "experience"    => "",
                 "active"        => 1            
@@ -174,10 +174,11 @@ class Users extends Mingual_Controller {
             $arrLocation = explode(", ", $location );
 
             $arrProfile['hometown'] = "";
-            for( $i = 0; $i < count($arrLocation)-1; $i++ )
+            if( isset( $user['hometown']) )
             {
-                $arrProfile['hometown'] .= $arrLocation[$i] . " ";
+                $arrProfile['hometown'] = $user['hometown']['name'] ;
             }
+                        
             $country = $arrLocation[count($arrLocation) -1 ];
             $arrProfile['id_country'] = $this->Country->getItems("country_name='".$country."' OR country_code='".$country."'", true)->id_country;
         }
@@ -189,8 +190,6 @@ class Users extends Mingual_Controller {
 
         $arrProfile['token']    = md5( $arrProfile['facebook_id'] . $arrProfile['first_name'] );
 
-print_r( $user );
-exit;
         $exists = $this->User->getItems( "facebook_id='".$arrProfile['facebook_id']."'", true );
         if( count( $exists ) > 0 ){
             

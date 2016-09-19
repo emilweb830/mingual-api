@@ -64,6 +64,9 @@ class User extends Mingual_Model
         $where = "1";
         $where .= " AND users.`id_user`!= ". $id_user;
 
+	    if( $arrOptions->sch_gender != "b" )
+        	$where .= " AND `gender`='".$arrOptions->sch_gender."'";
+
         if( $arrOptions->id_teach_lang > 0 )
             $where .= " AND `teach_lang`=".$arrOptions->id_teach_lang;
 
@@ -78,12 +81,9 @@ class User extends Mingual_Model
 	        // earth's radius: 6371 km, 3959 ml
 	        $where .= " AND 3959 * 2 * ASIN(SQRT( POW(SIN(($lat - ".$this->table_name.".latitude) * pi()/180 / 2), 2) + COS($lat * pi()/180) * COS(".$this->table_name.".latitude * pi()/180) * POW(SIN(($lon - ".$this->table_name.".longitude) * pi()/180 / 2), 2) )) < $r";
 
-	    if( $arrOptions->sch_gender != "b")
-        	$where .= " AND `gender`='".$arrOptions->sch_gender."'";
-        
         $where .= " AND `age` > ". $arrOptions->sch_age_low." AND `age` < ".$arrOptions->sch_age_high;
-        $where .= " AND `show_me`=1 AND active =1";
-		$where .= " AND !( (`id_partner1`='".$id_user."' && `mingual_status1`='1' && `id_partner2`=users.id_user) OR (`id_partner2`='".$id_user."' && `mingual_status2`='1' && `id_partner1`=users.id_user)) OR ( (`id_partner1` is NULL) && (`id_partner2` is NULL) )";
+        $where .= " AND settings.`show_me`=1 AND users.`active`=1";
+		$where .= " AND (!( (`id_partner1`=".$id_user." && `mingual_status1`='1' && `id_partner2`=users.id_user) OR (`id_partner2`=".$id_user." && `mingual_status2`='1' && `id_partner1`=users.id_user)) OR ( (`id_partner1` is NULL) && (`id_partner2` is NULL) ))";
 
 		$this->_db->where( $where );
 		$count = 0;
@@ -105,7 +105,9 @@ class User extends Mingual_Model
 		if($query->num_rows() > 0)
 		{
 			$rows = $query->result();
-			foreach( $rows as &$v){
+			foreach( $rows as &$v)
+			{
+
 				$v = $this->getFullProfileById( $v->id_user );
 				$v->distance 	= 3959 * 2 * ASIN(SQRT( POW(SIN(($lat - $v->latitude) * pi()/180 / 2), 2) + COS($lat * pi()/180) * COS( $v->latitude * pi()/180) * POW(SIN(($lon - $v->longitude) * pi()/180 / 2), 2) ));
 			}
