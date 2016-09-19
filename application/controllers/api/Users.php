@@ -117,7 +117,7 @@ class Users extends Mingual_Controller {
 
         try {
           // Returns a `Facebook\FacebookResponse` object
-          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location,hometown,picture', $access_token);
+          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location{location},hometown,picture', $access_token);
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
             $this->response([
                 'status' => FALSE,
@@ -151,7 +151,7 @@ class Users extends Mingual_Controller {
                 "experience"    => "",
                 "active"        => 1            
             );
-
+//print_r( $user );
         if( isset($user['age_range']['min']))
             $arrProfile['age'] = $user['age_range']['min'];
 
@@ -169,27 +169,26 @@ class Users extends Mingual_Controller {
                 $arrProfile['age'] = $age;
         }
 
-        if( isset( $user['location'])){
-            $location = $user['location']['name'];
-            $arrLocation = explode(", ", $location );
+        $arrProfile['hometown'] = "";
+        if( isset( $user['hometown']) )
+            $arrProfile['hometown'] = $user['hometown']['name'] ;
 
-            $arrProfile['hometown'] = "";
-            if( isset( $user['hometown']) )
-            {
-                $arrProfile['hometown'] = $user['hometown']['name'] ;
-            }
-                        
-            $country = $arrLocation[count($arrLocation) -1 ];
-            $arrProfile['id_country'] = $this->Country->getItems("country_name='".$country."' OR country_code='".$country."'", true)->id_country;
+        if( isset( $user['location'])){
+            $location = $user['location']['location'];
+            //$arrProfile['current_city'] = $location['city'];
+
+            $country = $location['country'];
+            $country = $this->Country->getItems("country_name like '%".$country."%' OR country_code='".$country."'", true);
+        
+            if( isset($country->id_country) )
+                $arrProfile['id_country'] = $country->id_country;
+            else
+                $arrProfile['id_country'] = 230;
         }
         else
-        {
-            $arrProfile['id_country'] = 0;
-            $arrProfile['hometown'] = "";
-        }
+            $arrProfile['id_country'] = 230;
 
         $arrProfile['token']    = md5( $arrProfile['facebook_id'] . $arrProfile['first_name'] );
-
         $exists = $this->User->getItems( "facebook_id='".$arrProfile['facebook_id']."'", true );
         if( count( $exists ) > 0 ){
             
@@ -202,7 +201,7 @@ class Users extends Mingual_Controller {
                 'token'     => $token
             ], REST_Controller::HTTP_OK); 
         }
-        
+
         if( $id = $this->User->addItem( $arrProfile ))
         {
             $picture =  $user->getPicture(); 

@@ -74,7 +74,8 @@ class User extends Mingual_Model
             $where .= " AND `learn_lang`=".$arrOptions->id_learn_lang;
 
         if( $arrOptions->sch_city != "" && $arrOptions->sch_type == "g" )
-            $where .= " AND `hometown` like '%".$arrOptions->sch_city."%'";
+        	$where .=  " AND ('".$arrOptions->sch_city."' LIKE CONCAT('%', hometown, '%') OR (`hometown` like '%".$arrOptions->sch_city."%')) ";
+            //$where .= " AND `hometown` like '%".$arrOptions->sch_city."%'";
 
         if( $arrOptions->sch_type == "l")
 	        // calculate distance as mile
