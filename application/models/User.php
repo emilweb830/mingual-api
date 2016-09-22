@@ -147,7 +147,13 @@ class User extends Mingual_Model
 			foreach( $minguals as $mingual )
 				$this->Mingual->deleteItem( $mingual->id );
 		}
-
+		// photos
+		$photos = $this->Photo->getItems( "`id_user`=".$id_user );
+		if( count( $photos ) > 0 && !empty( $photos ) )
+		{
+			foreach( $photos as $photo )
+				$this->Photo->deleteItem( $photo->id_photo );
+		}		
 		// delete reports
 		$reports = $this->Report->getItems( "`id_user`=".$id_user." OR `report_user`=".$id_user );
 		if( count( $reports ) > 0 && !empty( $reports ) )

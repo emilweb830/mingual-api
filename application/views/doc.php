@@ -129,6 +129,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					age			: int
 					id_country	: int
 					hometown	: string
+					education	: string
 					about_me	: text
 					experience	: text
 					Photo 		: array
@@ -173,6 +174,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			        "language_code": "ru",
 			        "active": 1
 			      },
+			      "education": ""
 			      "about_me": "",
 			      "experience": "",
 			      "token": "",
@@ -299,6 +301,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			        "language_code": "ru",
 			        "active": 1
 			      },
+			      "education": ""
 			      "about_me": "",
 			      "experience": "",
 			      "token": "",

@@ -64,8 +64,16 @@ class Users extends Mingual_Controller {
 
         if( isset($userData['photos']))
         {
+            $photos = $this->Photo->getItems( "`id_user`=".$id_user );
+            if( count( $photos ) > 0 && !empty( $photos ) )
+            {
+                foreach( $photos as $photo )
+                    $this->Photo->updateItem( array( "id_photo"=>$photo->id_photo, "id_user"=>0 ) );
+            }
+
+            $sort = 1;
             foreach( $userData['photos'] as $id_photo )
-                $this->Photo->updateItem( array( "id_photo"=>$id_photo, "id_user"=>$id_user ) );
+                $this->Photo->updateItem( array( "id_photo"=>$id_photo, "id_user"=>$id_user, "sort"=>$sort++ ) );
 
             unset( $userData['photos']);
         }
@@ -171,6 +179,7 @@ class Users extends Mingual_Controller {
                 "longitude"     => "",
                 "age"           => 10,
                 "about_me"      => "",
+                "education"     => "",
                 "experience"    => "",
                 "active"        => 1            
             );
@@ -192,13 +201,17 @@ class Users extends Mingual_Controller {
                 $arrProfile['age'] = $age;
         }
 
+        if( isset( $user['education'] )){
+            foreach( $user['education'] as $education )
+                $arrProfile['education'] = $education['school']['name'];
+        }
+
         $arrProfile['hometown'] = "";
         if( isset( $user['hometown']) )
             $arrProfile['hometown'] = $user['hometown']['name'] ;
 
         if( isset( $user['location'])){
             $location = $user['location']['location'];
-            //$arrProfile['current_city'] = $location['city'];
 
             $country = $location['country'];
             $country = $this->Country->getItems("country_name like '%".$country."%' OR country_code='".$country."'", true);
@@ -279,7 +292,7 @@ class Users extends Mingual_Controller {
     {
         $id_user = parent::checkPermission();
         $input = $this->put();
-        
+
         if( !isset($input['report_type']) || !isset($input['comment']) || $input['report_userID'] == $id_user )
         {
             $this->response([
