@@ -26,6 +26,12 @@ class Mingual_Controller extends REST_Controller {
     {
         $headers = getallheaders();
         $token = isset( $headers['Token'])? $headers['Token'] : "";
+        if( !$token ){
+            $this->response([
+                'status'    => false,
+                'message'   => "Invalid Acccess."
+            ], REST_Controller::HTTP_OK);
+        }
 
         $id_user = $this->User->checkLogin( $token );
         if( !$id_user && $token != "" )

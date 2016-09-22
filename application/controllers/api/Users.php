@@ -70,6 +70,31 @@ class Users extends Mingual_Controller {
             unset( $userData['photos']);
         }
 
+        if( isset($userData['latitude']) && isset($userData['longitude']))
+        {
+            $lat = $userData['latitude'];
+            $lon = $userData['longitude'];
+            $url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lon&sensor=false";
+
+            // Make the HTTP request
+            $data = @file_get_contents($url);
+            // Parse the json response
+            $jsondata = json_decode($data,true);
+
+            $setting = $this->Setting->getItems( "`id_user`='".$id_user."'", true );
+            $settingData['id_user'] = $id_user;
+            $settingData['id'] = $setting->id;
+            $settingData['sch_local_address'] = $jsondata['results']['0']['formatted_address'];
+
+            if( !$this->Setting->updateItem( $settingData ))
+            {
+                $this->response([
+                    'status'    => false,
+                    'message'   => "Error"
+                ], REST_Controller::HTTP_OK); 
+            }
+        }
+
         if( $this->User->updateItem( $userData ))
         {
             $this->response([
@@ -89,7 +114,7 @@ class Users extends Mingual_Controller {
     public function profile_delete()
     {
         $id_user    = parent::checkPermission();
-        if( $this->User->updateItem( array( "id_user"=> $id_user,"token"=> "", "active" => 0 ) ) )
+        if( $this->User->deleteUser( $id_user ) )
         {
             $this->response([
                 'status'    => true,
@@ -117,7 +142,7 @@ class Users extends Mingual_Controller {
 
         try {
           // Returns a `Facebook\FacebookResponse` object
-          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location{location},hometown,picture', $access_token);
+          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location{location},hometown,picture,education', $access_token);
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
             $this->response([
                 'status' => FALSE,
@@ -145,13 +170,11 @@ class Users extends Mingual_Controller {
                 "latitude"      => "",
                 "longitude"     => "",
                 "age"           => 10,
-                "teach_lang"    => 2,
-                "learn_lang"    => 2,
                 "about_me"      => "",
                 "experience"    => "",
                 "active"        => 1            
             );
-//print_r( $user );
+
         if( isset($user['age_range']['min']))
             $arrProfile['age'] = $user['age_range']['min'];
 
@@ -256,8 +279,8 @@ class Users extends Mingual_Controller {
     {
         $id_user = parent::checkPermission();
         $input = $this->put();
-
-        if( !isset($input['report_type']) || !isset($input['comment']) )
+        
+        if( !isset($input['report_type']) || !isset($input['comment']) || $input['report_userID'] == $id_user )
         {
             $this->response([
                 'status'    => false,
@@ -338,7 +361,7 @@ class Users extends Mingual_Controller {
         if( empty( $users ) || count( $users ) < 1 )
         {
             $this->response([
-                'status'    => true,
+                'status'    => false,
                 'message'   => "No Matched User."
             ], REST_Controller::HTTP_OK);
         }

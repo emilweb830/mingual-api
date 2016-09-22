@@ -76,7 +76,7 @@ class Mingual extends Mingual_Model
 
 	public function getPartnerList( $id_user, $offset = 0 )
 	{
-		$where = "(`id_partner1`=$id_user OR `id_partner2`=$id_user) AND `status`=1";
+		$where = "(`id_partner1`=$id_user OR `id_partner2`=$id_user) AND `mingual_status1`=1 AND `mingual_status2`=1 AND `status`=1";
 
 		$this->__construct();
 		$this->_db->select( "*");

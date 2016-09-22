@@ -55,6 +55,19 @@ class Settings extends Mingual_Controller {
         $settingData['id_user'] = $id_user;
         $settingData['id'] = $setting->id;
 
+        if( isset( $settingData['sch_city']))
+        {
+            $address = $settingData['sch_city']; // Google HQ
+            $prepAddr = str_replace(' ','+',$address);
+            $geocode=file_get_contents('https://maps.google.com/maps/api/geocode/json?address='.$prepAddr.'&sensor=false');
+            $output= json_decode($geocode);
+            $latitude = $output->results[0]->geometry->location->lat;
+            $longitude = $output->results[0]->geometry->location->lng;
+
+            $settingData['sch_g_lat'] = $latitude;
+            $settingData['sch_g_lng'] = $longitude;
+        }
+
         if( $this->Setting->updateItem( $settingData ))
         {
             $this->response([

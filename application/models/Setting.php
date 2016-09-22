@@ -34,9 +34,11 @@ class Setting extends Mingual_Model
 				"sch_city"		=> "",
 				"sch_gender"	=> "m",
 				"sch_age_low"	=> 18,
-				"sch_age_high"	=> 100,
-				"sch_type"		=> "l"
-				
+				"sch_age_high"	=> 99,
+				"sch_type"		=> "l",
+				"sch_local_address" => "",
+				"sch_g_lng"		=> "",
+				"sch_g_lat"		=> ""
 			);
 		return $this->addItem( $arrSetting );
 	}

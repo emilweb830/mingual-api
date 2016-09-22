@@ -129,8 +129,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					age			: int
 					id_country	: int
 					hometown	: string
-					teach_lang	: int
-					learn_lang	: int
 					about_me	: text
 					experience	: text
 					Photo 		: array
