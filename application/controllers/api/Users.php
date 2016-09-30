@@ -150,7 +150,7 @@ class Users extends Mingual_Controller {
 
         try {
           // Returns a `Facebook\FacebookResponse` object
-          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location{location},hometown,picture,education', $access_token);
+          $response = $this->fb->get('/me?fields=id,name,email,gender,age_range,birthday,first_name,last_name,about,location{location},hometown,picture,education,bio', $access_token);
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
             $this->response([
                 'status' => FALSE,
@@ -186,6 +186,9 @@ class Users extends Mingual_Controller {
 
         if( isset($user['age_range']['min']))
             $arrProfile['age'] = $user['age_range']['min'];
+
+        if( isset($user['bio']))
+            $arrProfile['about_me'] = $user['bio'];
 
         if( isset($user['birthday']) )
         {
@@ -240,15 +243,15 @@ class Users extends Mingual_Controller {
 
         if( $id = $this->User->addItem( $arrProfile ))
         {
-            $picture =  $user->getPicture(); 
+            $picture =  $user->getPicture();
             $file_url = $picture['url']; 
 
-            $url = "https://graph.facebook.com/".$user['id']."/picture?type=large";
+            $url = "https://graph.facebook.com/".$user['id']."/picture??width=800&height=800";
             $headers = get_headers($url, 1);
             if( isset($headers['Location']) )
                 $file_url = $headers['Location'];
 
-            $this->Photo->addItem(array("id_user"=>$id, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));  
+            $this->Photo->addItem(array("id_user"=>$id, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s"), "sort"=>1));  
             
             $this->Setting->createDefaultSetting( $id );
             $this->set_response([
@@ -477,7 +480,7 @@ class Users extends Mingual_Controller {
                 {
                     $upload = $this->upload->data();
                     $file_url = base_url()."uploads/photos/".$upload['file_name'];
-                    $id_photo = $this->Photo->addItem(array("id_user"=>0, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s")));
+                    $id_photo = $this->Photo->addItem(array("id_user"=>0, "url"=> $file_url, "date_add"=>date("Y-m-d h:i:s"), "sort"=>1));
                     $this->response([
                         'status' => TRUE,
                         'photo_id' => $id_photo

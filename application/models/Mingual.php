@@ -56,7 +56,7 @@ class Mingual extends Mingual_Model
 			if( $exist->mingual_status2 == 0 )
 				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 0, "mingual_status2" => 0, "status" => 0));
 			else
-				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 0));
+				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 0, "mingual_status2" => 0));
 
 			return true;
 		}
@@ -66,7 +66,7 @@ class Mingual extends Mingual_Model
 			if( $exist->mingual_status1 == 0 )
 				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 0, "mingual_status2" => 0, "status" => 0));
 			else
-				$this->updateItem(array("id" => $exist->id, "mingual_status2" => 0));
+				$this->updateItem(array("id" => $exist->id, "mingual_status1" => 0, "mingual_status2" => 0));
 
 			return true;
 		}
